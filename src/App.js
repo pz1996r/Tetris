@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
-import TetrisBoard from './components/TetrisBoard/TetrisBoadrd';
+import TetrisBoard from './components/TetrisBoard/TetrisBoard';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <TetrisBoard rows={18} columns={36} />
+        <TetrisBoard />
       </header>
     </div>
   );
