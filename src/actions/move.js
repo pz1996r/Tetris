@@ -1,10 +1,11 @@
-export const move = (x, y, shape) => {
+export const move = (x, y, shape, direction) => {
     return {
         type: 'MOVE',
         payload: {
             x,
             y,
-            shape
+            shape,
+            direction
         }
     }
 }

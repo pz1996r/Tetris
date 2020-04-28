@@ -1,9 +1,10 @@
-export const createNewBoard = (rows, columns) => {
+export const createNewBoard = (rows, columns, currentShape) => {
     return {
         type: 'CREATE_NEW_BOARD',
         payload: {
             rows,
-            columns
+            columns,
+            currentShape
         }
     }
 }

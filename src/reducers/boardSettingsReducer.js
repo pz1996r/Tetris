@@ -1,8 +1,8 @@
 const initialState = {
     rows: 18,
     columns: 26,
-    pause: false,
-    // pause: true,
+    // pause: false,
+    pause: true,
     shapes: [
         [
             [0, 1, 0],
