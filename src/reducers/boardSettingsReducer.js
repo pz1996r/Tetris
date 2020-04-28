@@ -1,8 +1,9 @@
 const initialState = {
     rows: 18,
     columns: 26,
-    // pause: false,
+    initialBlockCordinates: { x: 9, y: -2 },
     pause: true,
+    colors: ['red', 'green', 'blue', 'pink', 'yellow', 'orange'],
     shapes: [
         [
             [0, 1, 0],

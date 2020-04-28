@@ -27,9 +27,7 @@ const Board = styled.div`
 const Block = styled.div`
     padding-bottom: ${({ eSize }) => (eSize + '%')};
     width: ${({ eSize }) => (eSize + '%')};
-    /* background: ${({ status }) => (status && status.color ? status.color : '')}; */
-    background: ${({ status }) => (status ? 'green' : '')};
-
+    background: ${({ status }) => (status ? status.color : '')};
     display: block;
     border: 1px solid black;
     box-sizing:border-box;
@@ -45,45 +43,20 @@ const TetrisBoard = ({ rows, columns, board, pause, currentBlock, currentShape, 
     actualCurrentShape.current = currentShape;
     actualBoard.current = board;
 
-    const checkColision = () => {
-        // console.log(actualCurrentShape.current, actualCurrentBlock.current, actualBoard.current);
-        // y -2
-
-        // const antyCliner = []
-        // actualCurrentShape.current.payload.shape.forEach((tab, y) => {
-        //     tab.forEach((block, x) => {
-        //         if (block !== 0) {
-        //             const cordX = actualCurrentBlock.current.x + x - 1;
-        //             const cordY = actualCurrentBlock.current.y + y - 1;
-        //             if (cordX >= 0 && cordY >= 0) {
-        //                 const flag = board[cordY][cordX] !== 0;
-        //                 // console.log(flag);
-        //                 // flag === 
-        //                 // board[cordY][cordX] = 99;
-        //                 // antyCliner.push(`[${cordX},${cordY}]`);
-        //             }
-        //         }
-        //     })
-
-        // })
-
-    };
-
     const makeMove = useCallback((x = 0, y = 1, direction = 'DOWN') => {
-        checkColision();
         move(actualCurrentBlock.current.x + x, actualCurrentBlock.current.y + y, actualCurrentShape.current, direction);
     }, [currentBlock, move, shapes])
 
 
 
-    const generateRandomShape = () => {
-        const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
-        return randomShape;
-    }
+    // const generateRandomShape = () => {
+    //     const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+    //     return randomShape;
+    // }
 
     useEffect(() => {
-        const shape = generateRandomShape();
-        createNewBoard(rows, columns, shape);
+        // const shape = generateRandomShape();
+        createNewBoard(rows, columns);
     }, [columns, createNewBoard, rows]);
 
     useEffect(() => {

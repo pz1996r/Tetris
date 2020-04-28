@@ -1,5 +1,13 @@
 import { createStore, applyMiddleware } from 'redux';
 import rootReducer from '../reducers';
+import { resetShape } from '../actions/resetShape';
+import { resetCordinates } from '../actions/resetCordinates';
+import { putBlock } from '../actions/putBlock';
+import { resetColor } from '../actions/resetColor';
+
+function isObject(value) {
+    return value && typeof value === 'object' && value.constructor === Object;
+}
 
 const canMove = (action, state) => {
     state = state.getState().board
@@ -16,20 +24,19 @@ const canMove = (action, state) => {
                 const prevX = state.currentBlock.x + x - 1;
                 const prevY = state.currentBlock.y + y - 1;
                 // cleaning
-                if (prevX >= 0 && prevY >= 0 && !antyCliner.includes(`[${prevX},${prevY}]`) && board[prevY] && board[prevY][prevX] === 99) {
+                if (prevX >= 0 && prevY >= 0 && !antyCliner.includes(`[${prevX},${prevY}]`) && board[prevY] && isObject(board[prevY][prevX])) {
                     board[prevY][prevX] = 0;
                 }
                 // filling
-                // 0 empty fill | 99 folling pixel 
-                if (cordX >= 0 && cordY >= 0 && board[cordY] && (board[cordY][cordX] === 0 || board[cordY][cordX] === 99)) {
-                    board[cordY][cordX] = 99;
+                if (cordX >= 0 && cordY >= 0 && board[cordY] && ((board[cordY][cordX] && board[cordY][cordX].falling === true) || board[cordY][cordX] === 0)) {
+                    board[cordY][cordX] = { color: state.currentColor, falling: true };
                     antyCliner.push(`[${cordX},${cordY}]`);
                 } else {
                     if (cordY >= 0) {
                         switch (action.payload.direction) {
-                            case 'LEFT': console.log('left'); cantMoveFlag = 'LEFT'; break;
-                            case 'RIGHT': console.log('right'); cantMoveFlag = 'RIGHT'; break;
-                            default: console.log('down'); cantMoveFlag = 'DOWN'; break;
+                            case 'LEFT': cantMoveFlag = 'LEFT_FORBIDDEN'; break;
+                            case 'RIGHT': cantMoveFlag = 'RIGHT_FORBIDDEN'; break;
+                            default: cantMoveFlag = 'DOWN_FORBIDDEN'; break;
                         }
                     }
 
@@ -39,28 +46,40 @@ const canMove = (action, state) => {
 
     })
     return cantMoveFlag || {
-        // ...state,
         boardView: board,
         currentBlock: { x: action.payload.x, y: action.payload.y },
     }
 }
 
-
-const moveMenager = (store) => (next) => (action) => {
+const moveMenagerMiddeware = (store) => (next) => (action) => {
+    // Middleware responsible for movmend of the block in case when the move is forbidden (left and right: middleware doesn't push action to the reducer)
+    // Case move is forbidden and the direction is down pushing actions like checking Points, setting new Position of the block and setting new shape of the block
+    const state = store.getState();
     const modifyAction = { ...action };
+    if (action.type === 'CREATE_NEW_BOARD') {
+        next(resetShape(state.boardSettings.shapes));
+        next(resetColor(state.boardSettings.colors));
+    }
     if (action.type === 'MOVE') {
         const canMoveResult = canMove(action, store);
         switch (canMoveResult) {
-            case 'LEFT': console.log('LEFT-BLOCK'); break;
-            case 'RIGHT': console.log('RIGHT_BLOCK'); break;
-            case 'DOWN': console.log('DOWN_BLOCK'); break;
-            default: console.log('CAN_MOVE'); modifyAction.payload = { ...canMoveResult }; next(modifyAction);; break;
+            case 'LEFT_FORBIDDEN': break;
+            case 'RIGHT_FORBIDDEN': break;
+            case 'DOWN_FORBIDDEN':
+                console.log('DOWN_BLOCK');
+                next(putBlock(store));
+                next(resetCordinates(state.boardSettings.initialBlockCordinates));
+                next(resetShape(state.boardSettings.shapes));
+                next(resetColor(state.boardSettings.colors));
+                break;
+
+            default: modifyAction.payload = { ...canMoveResult }; next(modifyAction); break;
         }
     } else {
         next(action);
     }
-    // next(action);
 }
-const store = createStore(rootReducer, {}, applyMiddleware(moveMenager));
+
+const store = createStore(rootReducer, {}, applyMiddleware(moveMenagerMiddeware));
 
 export default store;

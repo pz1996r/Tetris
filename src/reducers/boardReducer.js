@@ -2,9 +2,10 @@ const initialState = {
     boardView: [],
     currentBlock: { x: 9, y: -2 },
     currentShape: [],
+    currentColor: '',
     score: 0,
 }
-
+// Pomyśleć nad tym aby current Block połaczyć podczas inicjalizacji z pozycją z drugiego reducera
 const createTetrisBoard = (rows, columns) => {
     const row = [];
     const board = [];
@@ -16,15 +17,34 @@ const createTetrisBoard = (rows, columns) => {
 }
 
 export const boardReducer = (state = { ...initialState }, action) => {
+    // console.log(action.payload, 'powiino');
+    // console.log(state);
     switch (action.type) {
         case 'CREATE_NEW_BOARD':
             return {
                 ...state,
                 boardView: createTetrisBoard(action.payload.rows, action.payload.columns),
-                currentShape: action.payload.currentShape,
+                // currentShape: action.payload.currentShape,
+                // currentColor: action.payload.currentColor,
                 score: 0,
             }
         case 'MOVE': return {
+            ...state,
+            ...action.payload
+        }
+        case 'RESET_SHAPE': return {
+            ...state,
+            currentShape: action.payload.currentShape,
+        }
+        case 'RESET_CORDINATES': return {
+            ...state,
+            currentBlock: action.payload.cordinates
+        }
+        case 'PUT_BLOCK': return {
+            ...state,
+            ...action.payload
+        }
+        case 'RESET_COLOR': return {
             ...state,
             ...action.payload
         }
