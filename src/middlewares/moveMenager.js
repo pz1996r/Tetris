@@ -2,10 +2,8 @@ import { resetShape } from '../actions/resetShape';
 import { resetCordinates } from '../actions/resetCordinates';
 import { putBlock } from '../actions/putBlock';
 import { resetColor } from '../actions/resetColor';
-
-function isObject(value) {
-    return value && typeof value === 'object' && value.constructor === Object;
-}
+import { findAvailablePoints } from '../actions/findAvailablePoints';
+import isObject from '../common/isObject';
 
 const canMove = (action, state) => {
     state = state.getState().board
@@ -37,11 +35,9 @@ const canMove = (action, state) => {
                             default: cantMoveFlag = 'DOWN_FORBIDDEN'; break;
                         }
                     }
-
                 }
             }
         })
-
     })
     return cantMoveFlag || {
         boardView: board,
@@ -61,6 +57,7 @@ export const moveMenagerMiddleware = (store) => (next) => (action) => {
             case 'RIGHT_FORBIDDEN': break;
             case 'DOWN_FORBIDDEN':
                 next(putBlock(store));
+                next(findAvailablePoints(store));
                 next(resetCordinates(state.boardSettings.initialBlockCordinates));
                 next(resetShape(state.boardSettings.shapes));
                 next(resetColor(state.boardSettings.colors));

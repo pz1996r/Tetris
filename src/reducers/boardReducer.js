@@ -17,15 +17,11 @@ const createTetrisBoard = (rows, columns) => {
 }
 
 export const boardReducer = (state = { ...initialState }, action) => {
-    // console.log(action.payload, 'powiino');
-    // console.log(state);
     switch (action.type) {
         case 'CREATE_NEW_BOARD':
             return {
                 ...state,
                 boardView: createTetrisBoard(action.payload.rows, action.payload.columns),
-                // currentShape: action.payload.currentShape,
-                // currentColor: action.payload.currentColor,
                 score: 0,
             }
         case 'MOVE': return {
@@ -45,6 +41,10 @@ export const boardReducer = (state = { ...initialState }, action) => {
             ...action.payload
         }
         case 'RESET_COLOR': return {
+            ...state,
+            ...action.payload
+        }
+        case 'UPDATE_POINTS': console.log(action); return {
             ...state,
             ...action.payload
         }
