@@ -3,6 +3,7 @@ import { resetCordinates } from '../actions/resetCordinates';
 import { putBlock } from '../actions/putBlock';
 import { resetColor } from '../actions/resetColor';
 import { findAvailablePoints } from '../actions/findAvailablePoints';
+import { createNewBoard } from '../actions/createNewBoard';
 import isObject from '../common/isObject';
 
 const canMove = (action, state) => {
@@ -45,6 +46,19 @@ const canMove = (action, state) => {
     }
 }
 
+const IsGameOver = (state) => {
+    state = state.getState().board
+    let gameOverFlag = false;
+    state.currentShape.forEach((tab, y) => {
+        tab.forEach((block, x) => {
+            const cordY = state.currentBlock.y + y - 1;
+            console.log(cordY)
+            gameOverFlag = block !== 0 && cordY < 0 ? true : gameOverFlag;
+        })
+    })
+    return gameOverFlag;
+}
+
 export const moveMenagerMiddleware = (store) => (next) => (action) => {
     // Middleware responsible for movmend of the block in case when the move is forbidden (left and right: middleware doesn't push action to the reducer)
     // Case move is forbidden and the direction is down pushing actions like checking Points, setting new Position of the block and setting new shape of the block
@@ -55,14 +69,19 @@ export const moveMenagerMiddleware = (store) => (next) => (action) => {
         switch (canMoveResult) {
             case 'LEFT_FORBIDDEN': break;
             case 'RIGHT_FORBIDDEN': break;
-            case 'DOWN_FORBIDDEN':
-                next(putBlock(store));
-                next(findAvailablePoints(store));
-                next(resetCordinates(state.boardSettings.initialBlockCordinates));
-                next(resetShape(state.boardSettings.shapes));
-                next(resetColor(state.boardSettings.colors));
+            case 'DOWN_FORBIDDEN': console.log(IsGameOver(store));
+                if (IsGameOver(store)) {
+                    console.log('detected,', store, next, action);
+                    const { rows, columns } = state.boardSettings;
+                    next(createNewBoard(rows, columns));
+                } else {
+                    next(putBlock(store));
+                    next(findAvailablePoints(store));
+                    next(resetCordinates(state.boardSettings.initialBlockCordinates));
+                    next(resetShape(state.boardSettings.shapes));
+                    next(resetColor(state.boardSettings.colors));
+                }
                 break;
-
             default: modifyAction.payload = { ...canMoveResult }; next(modifyAction); break;
         }
     } else {

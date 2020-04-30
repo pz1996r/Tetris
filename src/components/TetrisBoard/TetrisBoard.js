@@ -7,6 +7,7 @@ import { createNewBoard } from '../../actions/createNewBoard';
 import { move } from '../../actions/move';
 import { pauseGame } from '../../actions/pauseGame';
 import { playGame } from '../../actions/playGame';
+import { rotate } from '../../actions/rotate';
 
 // import btn from '../../utils/btn.png';
 
@@ -33,7 +34,7 @@ const Block = styled.div`
     box-sizing:border-box;
 `;
 
-const TetrisBoard = ({ rows, columns, board, pause, currentBlock, currentShape, shapes, createNewBoard, move, pauseGame, playGame }) => {
+const TetrisBoard = ({ rows, columns, board, pause, currentBlock, currentShape, shapes, score, createNewBoard, move, rotate, pauseGame, playGame }) => {
     let timer = useRef(false);
     let listener = useRef(false);
     let actualCurrentBlock = useRef(false);
@@ -47,15 +48,18 @@ const TetrisBoard = ({ rows, columns, board, pause, currentBlock, currentShape, 
         move(actualCurrentBlock.current.x + x, actualCurrentBlock.current.y + y, actualCurrentShape.current, direction);
     }, [currentBlock, move, shapes])
 
-
-
-    // const generateRandomShape = () => {
-    //     const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
-    //     return randomShape;
-    // }
+    const rotateBlock = () => {
+        const iShape = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+        actualCurrentShape.current.forEach((el, i) => {
+            el.forEach((item, j) => {
+                iShape[j][actualCurrentShape.current.length - 1 - i] = item;
+            })
+        })
+        console.log(actualCurrentShape.current, iShape);
+        rotate(iShape);
+    }
 
     useEffect(() => {
-        // const shape = generateRandomShape();
         createNewBoard(rows, columns);
     }, [columns, createNewBoard, rows]);
 
@@ -68,6 +72,7 @@ const TetrisBoard = ({ rows, columns, board, pause, currentBlock, currentShape, 
                 case 'ArrowLeft': makeMove(-1, 0, 'LEFT'); break;
                 case 'ArrowRight': makeMove(1, 0, 'RIGHT'); break;
                 case 'ArrowDown': makeMove(); break;
+                case 'ArrowUp': rotateBlock(); break;
                 default: break;
             }
         };
@@ -80,13 +85,16 @@ const TetrisBoard = ({ rows, columns, board, pause, currentBlock, currentShape, 
     }, []);
 
     return (
-        <Board>
-            {board.map((row, ix) => {
-                return row.map((field, iy) => {
-                    return (<Block status={field} key={`${{ ix }}/${iy}`} eSize={100 / rows} />);
-                })
-            })}
-        </Board >
+        <>
+            <h1>{score}</h1>
+            <Board>
+                {board.map((row, ix) => {
+                    return row.map((field, iy) => {
+                        return (<Block status={field} key={`${{ ix }}/${iy}`} eSize={100 / rows} />);
+                    })
+                })}
+            </Board >
+        </>
     )
 }
 
@@ -98,15 +106,16 @@ const mapStateToProps = state => ({
     currentBlock: state.board.currentBlock,
     shapes: state.boardSettings.shapes,
     currentShape: state.board.currentShape,
+    score: state.board.score,
 })
 
 const mapDispatchToProps = {
     createNewBoard,
     move,
     pauseGame,
-    playGame
+    playGame,
+    rotate,
 }
 export default connect(mapStateToProps, mapDispatchToProps)(TetrisBoard);
 
-// klocek przyjmuje wartość odpowiadającą za kolor, 
 /* background-image:${() => (`url(${btn})`)}; */

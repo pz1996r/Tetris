@@ -44,7 +44,11 @@ export const boardReducer = (state = { ...initialState }, action) => {
             ...state,
             ...action.payload
         }
-        case 'UPDATE_POINTS': console.log(action); return {
+        case 'UPDATE_POINTS': return {
+            ...state,
+            ...action.payload
+        }
+        case 'ROTATE': return {
             ...state,
             ...action.payload
         }

@@ -22,7 +22,6 @@ export const putBlock = (state) => {
         payload: {
             ...response
         }
-
     }
 }
 
