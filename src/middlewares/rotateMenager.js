@@ -14,7 +14,6 @@ const canRotate = (action, state) => {
             const prevY = state.currentBlock.y + y - 1;
             // logic
             console.log(action, '...', prevY, prevX);
-            // if (action.payload.shape[prevY][prevX] !== 0) {
             if (action.payload.shape[y][x] !== 0) {
                 if (prevX >= 0 && prevY >= 0 && board[prevY] && ((board[prevY][prevX] && board[prevY][prevX].falling === true) || board[prevY][prevX] === 0)) {
                     board[prevY][prevX] = { color: state.currentColor, falling: true };
@@ -36,7 +35,6 @@ const canRotate = (action, state) => {
         currentShape: action.payload.shape
     }
 }
-
 
 export const rotateMenagerMiddleware = (store) => (next) => (action) => {
     const modifyAction = { ...action };

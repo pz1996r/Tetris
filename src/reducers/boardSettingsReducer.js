@@ -46,7 +46,3 @@ export const boardSettingsReducer = (state = { ...initialState }, action) => {
         default: return state;
     }
 }
-
-// wylosować guzik
-// uswawić pozycję guzika na górę
-// wylosować kolor

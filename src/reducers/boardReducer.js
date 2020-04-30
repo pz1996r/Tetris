@@ -4,8 +4,9 @@ const initialState = {
     currentShape: [],
     currentColor: '',
     score: 0,
+    gameOverFlag: false,
 }
-// Pomyśleć nad tym aby current Block połaczyć podczas inicjalizacji z pozycją z drugiego reducera
+
 const createTetrisBoard = (rows, columns) => {
     const row = [];
     const board = [];
@@ -49,6 +50,10 @@ export const boardReducer = (state = { ...initialState }, action) => {
             ...action.payload
         }
         case 'ROTATE': return {
+            ...state,
+            ...action.payload
+        }
+        case 'SET_GAME_OVER_FLAG': return {
             ...state,
             ...action.payload
         }

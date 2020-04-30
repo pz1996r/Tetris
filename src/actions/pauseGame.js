@@ -1,4 +1,4 @@
-export const pauseGame = (bolean) => {
+export const pauseGame = () => {
     return {
         type: 'PAUSE',
     }

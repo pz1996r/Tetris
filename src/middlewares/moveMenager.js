@@ -3,14 +3,15 @@ import { resetCordinates } from '../actions/resetCordinates';
 import { putBlock } from '../actions/putBlock';
 import { resetColor } from '../actions/resetColor';
 import { findAvailablePoints } from '../actions/findAvailablePoints';
-import { createNewBoard } from '../actions/createNewBoard';
+import { pauseGame } from '../actions/pauseGame';
+import { setGameOverFlag } from '../actions/setGameOverFlag';
 import isObject from '../common/isObject';
 
 const canMove = (action, state) => {
     state = state.getState().board
     let board = JSON.stringify(state.boardView);
     board = JSON.parse(board);
-    // to nie działa, nie mogę dojść dlaczego : let board = [...state.boardView];
+    // spread operator nie działa, nie mogę dojść dlaczego : let board = [...state.boardView];
     let cantMoveFlag = false;
     const antyCliner = []
     action.payload.shape.forEach((tab, y) => {
@@ -71,9 +72,8 @@ export const moveMenagerMiddleware = (store) => (next) => (action) => {
             case 'RIGHT_FORBIDDEN': break;
             case 'DOWN_FORBIDDEN': console.log(IsGameOver(store));
                 if (IsGameOver(store)) {
-                    console.log('detected,', store, next, action);
-                    const { rows, columns } = state.boardSettings;
-                    next(createNewBoard(rows, columns));
+                    next(pauseGame());
+                    next(setGameOverFlag(true));
                 } else {
                     next(putBlock(store));
                     next(findAvailablePoints(store));

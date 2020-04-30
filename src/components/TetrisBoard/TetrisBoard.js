@@ -1,40 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useCallback, useRef } from 'react';
-import styled from 'styled-components';
 import { connect } from 'react-redux';
+import GameView from '../GameView/GameView';
 
 import { createNewBoard } from '../../actions/createNewBoard';
 import { move } from '../../actions/move';
-import { pauseGame } from '../../actions/pauseGame';
-import { playGame } from '../../actions/playGame';
 import { rotate } from '../../actions/rotate';
 
-// import btn from '../../utils/btn.png';
-
-// const blockStatus = {
-//     FALLING: 'FALLING',
-//     FALLING_SQUARE: 'FALLING_SQUARE',
-//     LAYING: 'LAYING',
-//     EMPTY: 'EMPTY',
-// }
-
-const Board = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    max-width: 300px;
-    background: #424755;
-`;
-
-const Block = styled.div`
-    padding-bottom: ${({ eSize }) => (eSize + '%')};
-    width: ${({ eSize }) => (eSize + '%')};
-    background: ${({ status }) => (status ? status.color : '')};
-    display: block;
-    border: 1px solid black;
-    box-sizing:border-box;
-`;
-
-const TetrisBoard = ({ rows, columns, board, pause, currentBlock, currentShape, shapes, score, createNewBoard, move, rotate, pauseGame, playGame }) => {
+const TetrisBoard = ({ rows, columns, board, pause, currentBlock, currentShape, shapes, createNewBoard, move, rotate }) => {
     let timer = useRef(false);
     let listener = useRef(false);
     let actualCurrentBlock = useRef(false);
@@ -64,38 +37,32 @@ const TetrisBoard = ({ rows, columns, board, pause, currentBlock, currentShape, 
     }, [columns, createNewBoard, rows]);
 
     useEffect(() => {
-        // setting interval for falling down blocks
-        timer.current = setInterval(makeMove, 1000);
-        // setting listeners for moving and rotating blocks
-        listener.current = (e) => {
-            switch (e.code) {
-                case 'ArrowLeft': makeMove(-1, 0, 'LEFT'); break;
-                case 'ArrowRight': makeMove(1, 0, 'RIGHT'); break;
-                case 'ArrowDown': makeMove(); break;
-                case 'ArrowUp': rotateBlock(); break;
-                default: break;
-            }
-        };
-        document.addEventListener('keydown', listener.current);
+        if (!pause) {
+            // setting interval for falling down blocks
+            timer.current = setInterval(makeMove, 1000);
+            // setting listeners for moving and rotating blocks
+            listener.current = (e) => {
+                switch (e.code) {
+                    case 'ArrowLeft': makeMove(-1, 0, 'LEFT'); break;
+                    case 'ArrowRight': makeMove(1, 0, 'RIGHT'); break;
+                    case 'ArrowDown': makeMove(); break;
+                    case 'ArrowUp': rotateBlock(); break;
+                    default: break;
+                }
+            };
+            document.addEventListener('keydown', listener.current);
+        } else {
+            timer.current && clearInterval(timer.current);
+            listener.current && document.removeEventListener('keydown', listener.current);
+        }
 
         return () => {
-            clearInterval(timer.current);
-            document.removeEventListener('keydown', listener.current);
+            timer.current && clearInterval(timer.current);
+            listener.current && document.removeEventListener('keydown', listener.current);
         }
-    }, []);
+    }, [pause]);
 
-    return (
-        <>
-            <h1>{score}</h1>
-            <Board>
-                {board.map((row, ix) => {
-                    return row.map((field, iy) => {
-                        return (<Block status={field} key={`${{ ix }}/${iy}`} eSize={100 / rows} />);
-                    })
-                })}
-            </Board >
-        </>
-    )
+    return (<GameView />)
 }
 
 const mapStateToProps = state => ({
@@ -106,16 +73,11 @@ const mapStateToProps = state => ({
     currentBlock: state.board.currentBlock,
     shapes: state.boardSettings.shapes,
     currentShape: state.board.currentShape,
-    score: state.board.score,
 })
 
 const mapDispatchToProps = {
     createNewBoard,
     move,
-    pauseGame,
-    playGame,
     rotate,
 }
 export default connect(mapStateToProps, mapDispatchToProps)(TetrisBoard);
-
-/* background-image:${() => (`url(${btn})`)}; */

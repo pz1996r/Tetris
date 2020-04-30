@@ -1,4 +1,4 @@
-export const playGame = (bolean) => {
+export const playGame = () => {
     return {
         type: 'PLAY',
     }
