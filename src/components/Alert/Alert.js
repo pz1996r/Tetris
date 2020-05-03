@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 
 const GameOverWrapper = styled.p`
-position: fixed;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

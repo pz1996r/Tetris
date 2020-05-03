@@ -3,6 +3,7 @@ import React, { useEffect, useCallback, useRef } from 'react';
 import { connect } from 'react-redux';
 import GameView from '../GameView/GameView';
 
+import { rotateBlock as rotateTetrisBlock } from '../../common/rotateBlock';
 import { createNewBoard } from '../../actions/createNewBoard';
 import { move } from '../../actions/move';
 import { rotate } from '../../actions/rotate';
@@ -22,14 +23,7 @@ const TetrisBoard = ({ rows, columns, board, pause, currentBlock, currentShape, 
     }, [currentBlock, move, shapes])
 
     const rotateBlock = () => {
-        const iShape = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
-        actualCurrentShape.current.forEach((el, i) => {
-            el.forEach((item, j) => {
-                iShape[j][actualCurrentShape.current.length - 1 - i] = item;
-            })
-        })
-        console.log(actualCurrentShape.current, iShape);
-        rotate(iShape);
+        rotateTetrisBlock(rotate, actualCurrentShape.current);
     }
 
     useEffect(() => {
